@@ -39,10 +39,16 @@ router.get('/task/:id', async (req, res) => {
 
 router.patch('/task/:id', async (req, res) => {
     try{
-        const task = await Task.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
+        //const task = await Task.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
+        const task = await Task.findById(req.params.id)
+
         if(!task) {
             return res.status(404).send({status: 404, message: 'Our bad! We did not find your expected data'})
         }
+
+        Object.keys(req.body).forEach((property) => task[property] = req.body[property])
+        await task.save()
+
         res.send(task)
     } catch (error) {
         res.status(422).send(error)

@@ -14,6 +14,7 @@ router.post('/user', async (req, res) => {
     }
 })
 
+
 router.get('/user', async (req, res) => {
     try{
         const users = await User.find({})
@@ -37,10 +38,16 @@ router.get('/user/:id', async (req, res) => {
 
 router.patch('/user/:id', async (req, res) => {
     try{
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
+        //const user = await User.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
+        const user = await User.findById(req.params.id)
+
         if(!user) {
             return res.status(404).send({status: 404, message: 'Our bad! We did not find your expected data'})
         }
+
+        Object.keys(req.body).forEach((property) => user[property] = req.body[property])
+        await user.save()
+
         res.send(user)
     } catch (error) {
         res.status(422).send(error)
